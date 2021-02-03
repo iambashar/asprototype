@@ -1,6 +1,5 @@
 package com.packagename.prototype1.backend.facerec;
 
-import nu.pattern.OpenCV;
 import org.bytedeco.javacpp.DoublePointer;
 import org.bytedeco.javacpp.IntPointer;
 import org.bytedeco.opencv.opencv_core.MatVector;
@@ -34,13 +33,13 @@ public class FaceRecognizerModule {
     //My code
     public static void init()
     {
-        OpenCV.loadLocally();
+        nu.pattern.OpenCV.loadShared();
         faceRecognizer.read("mymodel.xml");
     }
 
 
     public static int compareimage (String str) throws IOException {
-        OpenCV.loadLocally();
+
         CascadeClassifier faceDetector = new CascadeClassifier("haarcascade_frontalface_alt.xml");
         //FaceRecognizer faceRecognizer = LBPHFaceRecognizer.create();
         byte[] data = Base64.getDecoder().decode(
@@ -52,6 +51,7 @@ public class FaceRecognizerModule {
         faceDetector.detectMultiScale(imgFrame, faceDetections);
 
         int prediction = -1;
+        double x = 0.00;
 
         for (Rect rect : faceDetections.toArray()) {
             System.out.println("ttt");
@@ -72,15 +72,18 @@ public class FaceRecognizerModule {
             faceRecognizer.predict (bufface, label, confidence);
 
             prediction = label.get(0);
-            double x = confidence.get(0);
+            x = confidence.get(0);
             System.out.println(x);
         }
+
+        if (x > 80.00)
+            prediction = -1;
         return prediction;
     }
 
     public static void take_in_Vector(String str,int id, int count) throws IOException {
         count = 0;
-        OpenCV.loadLocally();
+
         CascadeClassifier faceDetector = new CascadeClassifier("haarcascade_frontalface_alt.xml");
 
         byte[] data = Base64.getDecoder().decode(
@@ -115,3 +118,54 @@ public class FaceRecognizerModule {
         faceRecognizer.write("mymodel.xml");
     }
 }
+
+/**
+ * <dependency>
+ *             <groupId>org.bytedeco</groupId>
+ *             <artifactId>javacv-platform</artifactId>
+ *             <version>1.5.4</version>
+ *             <exclusions>
+ *                 <exclusion>
+ *                     <groupId>org.bytedeco</groupId>
+ *                     <artifactId>ffmpeg-platform</artifactId>
+ *                 </exclusion>
+ *                 <exclusion>
+ *                     <groupId>org.bytedeco</groupId>
+ *                     <artifactId>flycapture-platform</artifactId>
+ *                 </exclusion>
+ *                 <exclusion>
+ *                     <groupId>org.bytedeco</groupId>
+ *                     <artifactId>flandmark-platform</artifactId>
+ *                 </exclusion>
+ *                 <exclusion>
+ *                     <groupId>org.bytedeco</groupId>
+ *                     <artifactId>leptonica-platform</artifactId>
+ *                 </exclusion>
+ *                 <exclusion>
+ *                     <groupId>org.bytedeco</groupId>
+ *                     <artifactId>tesseract-platform</artifactId>
+ *                 </exclusion>
+ *                 <exclusion>
+ *                     <groupId>org.bytedeco</groupId>
+ *                     <artifactId>libdc1394-platform</artifactId>
+ *                 </exclusion>
+ *                 <exclusion>
+ *                     <groupId>org.bytedeco</groupId>
+ *                     <artifactId>librealsense-platform</artifactId>
+ *                 </exclusion>
+ *                 <exclusion>
+ *                     <groupId>org.bytedeco</groupId>
+ *                     <artifactId>librealsense2-platform</artifactId>
+ *                 </exclusion>
+ *                 <exclusion>
+ *                     <groupId>org.bytedeco</groupId>
+ *                     <artifactId>libfreenect-platform</artifactId>
+ *                 </exclusion>
+ *                 <exclusion>
+ *                     <groupId>org.bytedeco</groupId>
+ *                     <artifactId>libfreenect2-platform</artifactId>
+ *                 </exclusion>
+ *             </exclusions>
+ *
+ *         </dependency>
+ */
